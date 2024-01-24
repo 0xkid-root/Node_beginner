@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema(
+    
+    {
     name:{
         type:String,
         required:true,
@@ -46,9 +48,11 @@ const userSchema = new mongoose.Schema({
         default:0
     }
 
-},{
+},
+{
     timestamps:true,
-})
+}
+)
 
 
 // jab v user create hoga tab uske time store ho jaye ga  ---

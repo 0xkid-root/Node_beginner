@@ -1,6 +1,6 @@
 const JWT = require('jsonwebtoken');
 const userModel = require('../models/userModel');
-
+const Blacklist = require('../models/blacklist');
 //  hum middleware bana rh hai jeske through route ko protect kare gee --\
 
 // protected routes token base 
@@ -9,6 +9,19 @@ const requireSignIn = async (req, res, next) => {
     try {
         const token = req.headers.authorization.split(' ')[1]
         console.log(token);
+        if(!token){
+         return res.status(403).send({
+            success:false,
+            msg:'A Token is Required For Authentication'
+          });
+        }
+       const blacklistedToken = await Blacklist.findOne({token});
+       if(blacklistedToken){
+        return res.status(400).send({
+          success:false,
+          msg:"This session has expired, please try again !!"
+        })
+       }
       const decode = JWT.verify(
         token,
         process.env.JWT_SECRET
@@ -18,7 +31,7 @@ const requireSignIn = async (req, res, next) => {
       next();
     } catch (error) {
       console.log(error);
-      res.status(401).send({
+      return res.status(401).send({
         success: false,
         msg:'A Token is Require'
       })
@@ -41,7 +54,7 @@ const requireSignIn = async (req, res, next) => {
 
     } catch(error){
         console.log(error);
-        res.status(401).send({
+       return res.status(401).send({
             success:false,
             error,
             message:"Error In Admin MiddleWare",
